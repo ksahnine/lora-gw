@@ -1,4 +1,4 @@
 # Expérimentations réseau LoRa
 
 ## Schéma d'architecture
-![Architecture](docs/img/Archi_LoRa.png)
+![Architecture](docs/img/Schema_Archi_LoRa.png)
