@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+
+      <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading"><i class="fa fa-dashboard fa-fw"></i> Dashboard  </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                  <table class="table table-bordered">
+                                    <tbody>
+                                      <tr>
+                                        <th>Etat de la passerelle</th>
+                                        <td><span class="badge">{% if gwUp %}activ&eacute;e{% else %}d&eacute;sactiv&eacute;e{% endif %}</span></td>
+                                        <td>{% if gwUp %}
+                                              <a href="/gateway/stop" class="btn btn-primary connect-btn btn-xs">Stop</a>
+                                            {% else %}
+                                              <a href="/gateway/start" class="btn btn-success connect-btn btn-xs">Start</a>
+                                            {% endif %}
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <th>Adresse IP interface WiFi</th>
+                                        <td>{{ ip }}</td>
+                                        <td></td>
+                                      </tr>
+                                      <tr>
+                                        <th>Nom de la passerelle</th>
+                                        <td>{{ host }}</td>
+                                        <td></td>
+                                      </tr>
+                                    </tbody>
+                                  </table> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,5 @@
+    <ul class = "list-group">
+     {% for ssid in networks %}
+        <li class = "list-group-item"><button class="btn btn-success connect-btn btn-xs" data-toggle="modal" data-target="#connectModal" data-ssid="{{ ssid }}"><span class="glyphicon glyphicon-signal" aria-hidden="true"></span> connexion</button>  {{ ssid }}</li>
+      {% endfor %}
+    </ul>

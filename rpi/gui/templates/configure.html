@@ -1,0 +1,90 @@
+   {% extends "layout.html" %}
+   {% block content %}
+
+         <div class="row">
+           <div class="col-lg-12">
+               <div class="panel panel-primary">
+                   <div class="panel-heading"><i class="fa fa-dashboard fa-fw"></i> WiFi </div>
+                   <div class="panel-body">
+                     <div class="connect-btn-wrapper">
+                       <button id="wifiListBtn" class="btn btn-primary connect-btn">Afficher la liste des r&eacute;seaux</button>
+                     </div>
+                     <br />
+                     <div class="row">
+                         <div class="col-md-12">
+                               <div class="panel panel-default">
+                                   <div class="panel-body" id="networks">
+                                   </div>
+                               </div>
+                         </div>
+                     </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+
+       <!-- Modal -->
+       <div class="modal fade" id="connectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+           <div class="modal-content">
+           <form id="wifiLoginForm" method="POST" action="/wifi/connect">
+             <div class="modal-header">
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">&times;</span>
+               </button>
+               <h4 class="modal-title" id="connectLabel">Connexion au r&eacute;seau WiFi</h4>
+             </div>
+             <div class="modal-body">
+                   <div class="form-group row">
+                     <label for="ssid" class="col-sm-3 form-control-label">SSID</label>
+                     <div class="col-sm-9">
+                       <input type="text" class="form-control" id="ssid" placeholder="Mot de passe">
+                     </div>
+                   </div>
+                   <div class="form-group row">
+                     <label for="password" class="col-sm-3 form-control-label">Mot de passe</label>
+                     <div class="col-sm-9">
+                       <input type="password" class="form-control" id="password" placeholder="Mot de passe">
+                     </div>
+                   </div>
+             </div>
+             <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+               <button type="submit" class="btn btn-primary">Connecter</button>
+             </div>
+           </form>
+           </div>
+         </div>
+       </div>
+
+   {% endblock %}
+
+   {% block scripts %}
+       <script type="text/javascript">
+          $(document).ready(function() {
+            $('#wifiListBtn').on('click', function() {
+                  $.get('/wifi/list', function(data) {
+                    $('#networks').html(data);
+                  })
+            });
+
+            $('#connectModal').on('shown.bs.modal', function (event) {
+              $('#password').focus()
+              var button = $(event.relatedTarget) ;
+              var ssid = button.data("ssid");
+              var modal = $(this);
+              modal.find('.modal-body #ssid').val(ssid);
+            });
+
+            $('#wifiLoginForm').submit(function(e) {
+                e.preventDefault();
+                var f = $(this);
+                $.post('/wifi/connect', 
+                       {"ssid": f.find('#ssid').val(), "password": f.find('#password').val()}
+                );
+                $('#connectModal').modal('hide');
+            });
+          })          
+       </script>
+   {% endblock %}
+
