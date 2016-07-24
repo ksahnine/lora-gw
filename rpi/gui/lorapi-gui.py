@@ -6,6 +6,7 @@ __license__ = 'GPL v3'
 from flask import Flask, request, render_template, url_for, send_from_directory, redirect
 from flask.helpers import locked_cached_property
 from libs.loragw import LoRaGateway
+from datetime import datetime
 import subprocess
 import os
 
@@ -93,8 +94,9 @@ def index():
     ip = wifiAddress()
     host = hostname()
     wifi = wifiName()
+    now = datetime.now()
 
-    return render_template('index.html', gwUp=status, ip=ip, host=host, wifi=wifi)
+    return render_template('index.html', gwUp=status, ip=ip, host=host, wifi=wifi, now=now)
 
 @app.route('/configure')
 def configure():
