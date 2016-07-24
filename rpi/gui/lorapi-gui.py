@@ -5,15 +5,15 @@ __license__ = 'GPL v3'
 
 from flask import Flask, request, render_template, url_for, send_from_directory, redirect
 from flask.helpers import locked_cached_property
+from libs.loragw import LoRaGateway
 import subprocess
 import os
 
 iface     = "wlan0"
 statusCmd = "[ -f /tmp/loragw.pid ] && ps --no-headers `cat /tmp/loragw.pid`"
-stopCmd   = "kill -9 `cat /tmp/loragw.pid`"
-startCmd   = "nohup /home/pi/LoRa/lora_gateway/lora_gateway | python /home/pi/LoRa/lora_gateway/post_gw_mqtt.py --mqtt& echo $! > /tmp/loragw.pid"
 
 app = Flask(__name__)
+gw = LoRaGateway()
 
 def root_dir(): 
     return os.path.abspath(os.path.dirname(__file__))
@@ -34,9 +34,6 @@ def get_ip_address(ifname):
 def isGwUp():
     # Etat de la passerelle
     out = execCmd(statusCmd)
-    print "----"
-    print "-%s-" % (out)
-    print "----"
 
     status = False
     if out != "" :
@@ -46,20 +43,15 @@ def isGwUp():
 
 def startGw():
     # Demarrage de la passerelle LoRa
-    execCmd(startCmd)
-
-    #if err != None:
-    #    return False
+    gw = LoRaGateway()
+    gw.start()
 
     return True
 
 def stopGw():
     # Arret de la passerelle LoRa
-    execCmd(stopCmd)
+    gw.stop()
     
-    #if out == ""
-    #    return False
-
     return True
 
 def wifiAddress():
@@ -136,4 +128,4 @@ def gwCommand(command):
     return redirect('/')
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 80, debug=True)
+    app.run('0.0.0.0', 8080, debug=True)
