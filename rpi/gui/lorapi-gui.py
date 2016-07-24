@@ -6,13 +6,17 @@ __license__ = 'GPL v3'
 from flask import Flask, request, render_template, url_for, send_from_directory, redirect
 from flask.helpers import locked_cached_property
 import subprocess
+import os
 
-iface     = "en1"
+iface     = "wlan0"
 statusCmd = "ps -eaf | grep MacOS/Safari | grep -v grep"
 stopCmd   = ["killall","Safari"]
 startCmd  = ["open","http://www.google.fr"]
-
+wifiCmd   = ""
 app = Flask(__name__)
+
+def root_dir(): 
+    return os.path.abspath(os.path.dirname(__file__))
 
 def execCmd(cmd):
     ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
@@ -23,7 +27,7 @@ def execCmd(cmd):
     return out
 
 def get_ip_address(ifname):
-    cmd = 'ifconfig ' + ifname + ' | grep "inet " | cut -d" " -f2'
+    cmd = 'ifconfig ' + ifname + ' | grep "inet " | cut -d":" -f2 | cut -d" " -f1'
     ip = execCmd(cmd)
     return ip
 
@@ -68,6 +72,11 @@ def wifiAddress():
     ifname = iface
     return get_ip_address(ifname)    
 
+def wifiName():
+    # Nom reseau Wifi
+    cmd = 'iwgetid | cut -d":" -f2 | sed \'s/"//g\''
+    return execCmd(cmd)
+
 def hostname():
     # Hostname
     
@@ -96,8 +105,9 @@ def index():
     status = isGwUp()
     ip = wifiAddress()
     host = hostname()
+    wifi = wifiName()
 
-    return render_template('index.html', gwUp=status, ip=ip, host=host)
+    return render_template('index.html', gwUp=status, ip=ip, host=host, wifi=wifi)
 
 @app.route('/configure')
 def configure():
@@ -106,16 +116,18 @@ def configure():
 
 @app.route('/wifi/list')
 def networks():
-    networks = ['Virgin', 'Free', 'Bouygues', 'SFR']
+    #networks = ['Virgin', 'Free', 'Bouygues', 'SFR']
+    cmd = root_dir() + '/../bin/configure-wifi.sh list'
+    result = execCmd(cmd)
+    networks = result.split('\n')
     return render_template('wifi-list.html', networks=networks)
 
 @app.route('/wifi/connect', methods=['POST'])
 def wifiConnect():
     ssid = request.form['ssid']
     password = request.form['password']
-    #wifi = request.get_json(silent=True)
-    #print "SSID : %s / %s" % (wifi.ssid, wifi.password)
-    print "SSID : %s / %s" % (ssid, password)
+    cmd = "sudo %s/../bin/configure-wifi.sh configure %s %s" % (root_dir(), ssid, password)
+    execCmd(cmd)
     return render_template('wifi-list.html', status='OK')
 
 @app.route('/gateway/<command>')
