@@ -9,10 +9,10 @@ import subprocess
 import os
 
 iface     = "wlan0"
-statusCmd = "ps -eaf | grep MacOS/Safari | grep -v grep"
-stopCmd   = ["killall","Safari"]
-startCmd  = ["open","http://www.google.fr"]
-wifiCmd   = ""
+statusCmd = "[ -f /tmp/loragw.pid ] && ps --no-headers `cat /tmp/loragw.pid`"
+stopCmd   = "kill -9 `cat /tmp/loragw.pid`"
+startCmd   = "nohup /home/pi/LoRa/lora_gateway/lora_gateway | python /home/pi/LoRa/lora_gateway/post_gw_mqtt.py --mqtt& echo $! > /tmp/loragw.pid"
+
 app = Flask(__name__)
 
 def root_dir(): 
@@ -34,6 +34,9 @@ def get_ip_address(ifname):
 def isGwUp():
     # Etat de la passerelle
     out = execCmd(statusCmd)
+    print "----"
+    print "-%s-" % (out)
+    print "----"
 
     status = False
     if out != "" :
@@ -43,27 +46,19 @@ def isGwUp():
 
 def startGw():
     # Demarrage de la passerelle LoRa
-    cmd = startCmd
-    p = subprocess.Popen(cmd, stdout = subprocess.PIPE,
-                              stderr = subprocess.PIPE,
-                              stdin  = subprocess.PIPE)
-    out,err = p.communicate()
+    execCmd(startCmd)
 
-    if err != None:
-        return False
+    #if err != None:
+    #    return False
 
     return True
 
 def stopGw():
     # Arret de la passerelle LoRa
-    cmd = stopCmd
-    p = subprocess.Popen(cmd, stdout = subprocess.PIPE,
-                              stderr = subprocess.PIPE,
-                              stdin  = subprocess.PIPE)
-    out,err = p.communicate()
+    execCmd(stopCmd)
     
-    if err != None:
-        return False
+    #if out == ""
+    #    return False
 
     return True
 
@@ -141,4 +136,4 @@ def gwCommand(command):
     return redirect('/')
 
 if __name__ == '__main__':
-    app.run('0.0.0.0', 8080, debug=True)
+    app.run('0.0.0.0', 80, debug=True)
