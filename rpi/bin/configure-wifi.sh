@@ -23,7 +23,7 @@ EOF
 
 function list() 
 {
-  sudo iwlist wlan0 scan | grep ESSID | cut -d':' -f2
+  sudo iwlist wlan0 scan | grep ESSID | cut -d':' -f2 | sed 's/"//g'
 }
 
 if [ $# -lt 1 ]
