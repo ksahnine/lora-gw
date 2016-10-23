@@ -42,6 +42,15 @@
                      </div>
                    </div>
                    <div class="form-group row">
+                     <label for="mode" class="col-sm-3 form-control-label">Mode</label>
+                       <div class="col-sm-9">
+                         <select class="form-control" id="mode">
+                           <option value="wpa" selected>WPA</option>
+                           <option value="wep">WEP</option>
+                         </select>
+                       </div>
+                     </div>
+                   <div class="form-group row">
                      <label for="password" class="col-sm-3 form-control-label">Mot de passe</label>
                      <div class="col-sm-9">
                        <input type="password" class="form-control" id="password" placeholder="Mot de passe">
@@ -80,7 +89,7 @@
                 e.preventDefault();
                 var f = $(this);
                 $.post('/wifi/connect', 
-                       {"ssid": f.find('#ssid').val(), "password": f.find('#password').val()}
+                       {"mode": f.find('#mode').val(), "ssid": f.find('#ssid').val(), "password": f.find('#password').val()}
                 );
                 $('#connectModal').modal('hide');
             });

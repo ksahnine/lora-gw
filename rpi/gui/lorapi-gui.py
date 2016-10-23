@@ -113,9 +113,10 @@ def networks():
 
 @app.route('/wifi/connect', methods=['POST'])
 def wifiConnect():
+    mode = request.form['mode']
     ssid = request.form['ssid']
     password = request.form['password']
-    cmd = "sudo %s/../bin/configure-wifi.sh configure %s %s" % (root_dir(), ssid, password)
+    cmd = "sudo %s/../bin/configure-wifi.sh configure %s %s %s" % (root_dir(), mode, ssid, password)
     execCmd(cmd)
     return render_template('wifi-list.html', status='OK')
 
